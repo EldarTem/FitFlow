@@ -1,10 +1,11 @@
-<!-- src/views/NotAuthorizedView.vue -->
 <template>
   <div class="not-authorized-page">
     <h2>Нет доступа</h2>
     <p>У вас недостаточно прав для просмотра этой страницы.</p>
-    <el-button type="primary" @click="goBack">Вернуться</el-button>
-    <el-button @click="goHome">На главную</el-button>
+    <div class="authorized-button">
+      <el-button type="primary" @click="goBack">Вернуться назад</el-button>
+      <el-button @click="goHome">На главную</el-button>
+    </div>
   </div>
 </template>
 
@@ -42,12 +43,7 @@ export default defineComponent({
   height: 100%;
   text-align: center;
 }
-
-.not-authorized-page h2 {
-  margin-bottom: 20px;
-}
-
-.not-authorized-page p {
-  margin-bottom: 20px;
+.authorized-button {
+  display: flex;
 }
 </style>

@@ -3,9 +3,9 @@
     <h2>Моё расписание</h2>
 
     <el-empty v-if="!workingHours.length" description="Расписание отсутствует">
-      <el-button type="primary" icon="el-icon-plus" @click="openForm">
-        Добавить рабочее время
-      </el-button>
+      <el-button type="primary" icon="el-icon-plus" @click="openForm"
+        >Добавить рабочее время</el-button
+      >
     </el-empty>
 
     <el-table v-else :data="workingHours" style="width: 100%">
@@ -18,24 +18,22 @@
             size="small"
             icon="el-icon-edit"
             @click="editHour(scope.row)"
+            >Изменить</el-button
           >
-            Изменить
-          </el-button>
           <el-button
             size="small"
             type="danger"
             icon="el-icon-delete"
-            @click="deleteHour(scope.row.id)"
+            @click="deleteWorkingHour(scope.row.id)"
+            >Удалить</el-button
           >
-            Удалить
-          </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-button type="primary" icon="el-icon-plus" @click="openForm">
-      Добавить рабочее время
-    </el-button>
+    <el-button type="primary" icon="el-icon-plus" @click="openForm"
+      >Добавить рабочее время</el-button
+    >
 
     <el-dialog title="Рабочее время" v-model="showForm" @close="handleClose">
       <el-form :model="currentHour" ref="formRef" label-width="120px">
@@ -49,8 +47,7 @@
               :key="day"
               :label="day"
               :value="day"
-            >
-            </el-option>
+            ></el-option>
           </el-select>
         </el-form-item>
 
@@ -59,7 +56,6 @@
             v-model="currentHour.start_time"
             format="HH:mm"
             placeholder="Начало"
-            :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }"
           />
         </el-form-item>
 
@@ -68,7 +64,6 @@
             v-model="currentHour.end_time"
             format="HH:mm"
             placeholder="Конец"
-            :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }"
           />
         </el-form-item>
       </el-form>
@@ -95,15 +90,15 @@ export default defineComponent({
     const {
       workingHours,
       fetchWorkingHours,
-      addHour,
-      updateHour,
-      deleteHour,
+      addWorkingHour,
+      updateWorkingHour,
+      deleteWorkingHour,
     } = scheduleStore;
 
     const showForm = ref(false);
     const loading = ref(false);
     const formRef = ref();
-    const currentHour = reactive<WorkingHour>(getEmptyWorkingHour());
+    const currentHour = reactive<Partial<WorkingHour>>(getEmptyWorkingHour());
 
     const daysOfWeek = [
       "Monday",
@@ -115,9 +110,8 @@ export default defineComponent({
       "Sunday",
     ];
 
-    function getEmptyWorkingHour(): WorkingHour {
+    function getEmptyWorkingHour(): Partial<WorkingHour> {
       return {
-        id: undefined,
         trainer_id: 0,
         day_of_week: "",
         start_time: "",
@@ -125,47 +119,23 @@ export default defineComponent({
       };
     }
 
-    const formatTime = (time: Date) => {
-      const hours = String(time.getHours()).padStart(2, "0");
-      const minutes = String(time.getMinutes()).padStart(2, "0");
-      const seconds = "00";
-      return `${hours}:${minutes}:${seconds}`;
-    };
-
-    const parseTime = (time: string) => {
-      if (!time) return null;
-      const [hours, minutes, seconds] = time.split(":").map(Number);
-      const date = new Date();
-      date.setHours(hours, minutes, seconds || 0);
-      return date;
-    };
-
     const openForm = () => {
       Object.assign(currentHour, getEmptyWorkingHour());
       showForm.value = true;
     };
 
     const editHour = (hour: WorkingHour) => {
-      Object.assign(currentHour, {
-        ...hour,
-        start_time: parseTime(hour.start_time),
-        end_time: parseTime(hour.end_time),
-      });
+      Object.assign(currentHour, hour);
       showForm.value = true;
     };
 
     const saveHour = async () => {
       try {
         loading.value = true;
-        currentHour.start_time = formatTime(currentHour.start_time);
-        currentHour.end_time = formatTime(currentHour.end_time);
-
-        console.log("currentHour before saving:", currentHour);
-
         if (currentHour.id) {
-          await updateHour(currentHour);
+          await updateWorkingHour(currentHour as WorkingHour);
         } else {
-          await addHour(currentHour);
+          await addWorkingHour(currentHour);
         }
         showForm.value = false;
       } catch (error) {
@@ -176,7 +146,7 @@ export default defineComponent({
     };
 
     const handleClose = () => {
-      formRef.value?.resetFields();
+      (formRef.value as any)?.resetFields();
       showForm.value = false;
       Object.assign(currentHour, getEmptyWorkingHour());
     };
@@ -191,7 +161,7 @@ export default defineComponent({
       openForm,
       saveHour,
       editHour,
-      deleteHour,
+      deleteWorkingHour,
       loading,
       formRef,
       handleClose,

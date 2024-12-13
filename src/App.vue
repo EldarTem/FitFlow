@@ -1,13 +1,22 @@
 <!-- src/App.vue -->
+<!-- src/App.vue -->
 <template>
   <router-view />
+  <Loader :loading="uiStore.isLoading" />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { useUiStore } from "@/store/useUiStore";
+import Loader from "@/components/Loader.vue";
 
 export default defineComponent({
   name: "App",
+  components: { Loader },
+  setup() {
+    const uiStore = useUiStore();
+    return { uiStore };
+  },
 });
 </script>
 

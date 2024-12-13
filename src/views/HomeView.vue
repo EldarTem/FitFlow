@@ -1,4 +1,3 @@
-<!-- src/views/HomeView.vue -->
 <template>
   <div class="home">
     <el-row type="flex" justify="center" align="middle" class="welcome-section">
@@ -26,22 +25,15 @@ export default defineComponent({
       router.push("/login");
     };
 
-    return {
-      goToLogin,
-    };
+    return { goToLogin };
   },
 });
 </script>
 
 <style scoped>
 .home {
-  min-height: calc(100vh - 120px); /* Учитываем высоту хедера и футера */
+  min-height: calc(100vh - 60px);
 }
-
-.welcome-section {
-  height: 100%;
-}
-
 .text-center {
   text-align: center;
 }

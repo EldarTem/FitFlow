@@ -1,6 +1,6 @@
 <template>
   <div class="trainers-page">
-    <h2>Тренеры зала</h2>
+    <h2>Управление тренерами</h2>
     <el-button type="primary" @click="openAddForm" style="margin-bottom: 20px"
       >Добавить тренера</el-button
     >

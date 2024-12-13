@@ -1,6 +1,5 @@
-<!-- src/components/WorkoutCard.vue -->
 <template>
-  <el-card>
+  <el-card class="workout-card">
     <h3>{{ workout.name }}</h3>
     <p>{{ workout.description }}</p>
     <p>Тренер: {{ workout.trainerName }}</p>
@@ -10,9 +9,15 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Workout } from "@/types";
 import { useAuthStore } from "@/store/useAuthStore";
 import api from "@/services/api";
+
+interface Workout {
+  id: number;
+  name: string;
+  description: string;
+  trainerName?: string;
+}
 
 export default defineComponent({
   name: "WorkoutCard",
@@ -28,11 +33,11 @@ export default defineComponent({
     const enroll = async () => {
       if (!authStore.user) return;
       try {
+        // Предполагается эндпоинт /enrollments или подобный – подкорректируйте по вашему бэку
         await api.post("/enrollments", {
           userId: authStore.user.id,
           workoutId: props.workout.id,
         });
-        // Уведомление об успешной записи
       } catch (error) {
         console.error(error);
       }
@@ -44,3 +49,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.workout-card {
+  margin-bottom: 20px;
+}
+</style>

@@ -1,0 +1,146 @@
+<!-- src/components/TrainerCard.vue -->
+<template>
+  <el-card
+    class="trainer-card"
+    @mouseover="hovered = true"
+    @mouseleave="hovered = false"
+    shadow="hover"
+  >
+    <div class="trainer-photo-container">
+      <template v-if="trainer.photo_url">
+        <img
+          :src="trainer.photo_url"
+          alt="Фото тренера"
+          class="trainer-photo"
+          @error="trainer.photo_url = ''"
+        />
+      </template>
+      <template v-else>
+        <el-avatar icon="UserFilled" class="trainer-avatar"></el-avatar>
+      </template>
+    </div>
+    <h3>{{ trainer.name }}</h3>
+    <p><strong>Email:</strong> {{ trainer.email }}</p>
+    <p><strong>Телефон:</strong> {{ formattedPhone }}</p>
+    <p><strong>Специализация:</strong> {{ trainer.specialization }}</p>
+    <p><strong>Опыт (лет):</strong> {{ trainer.experience_years }}</p>
+    <p><strong>Биография:</strong> {{ trainer.bio }}</p>
+    <p><strong>Сертификаты:</strong> {{ trainer.certifications }}</p>
+
+    <div class="overlay" v-if="hovered">
+      <el-button @click="$emit('edit-trainer', trainer)"
+        >Редактировать</el-button
+      >
+
+      <el-button @click="$emit('view-schedule', trainer.user_id)"
+        >График</el-button
+      >
+      <el-button type="danger" @click="$emit('delete-trainer', trainer.user_id)"
+        >Удалить</el-button
+      >
+    </div>
+  </el-card>
+</template>
+
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
+import { Trainer } from "@/types";
+import { UserFilled } from "@element-plus/icons-vue";
+
+function formatPhone(value: string): string {
+  let digits = value.replace(/\D/g, "");
+  if (!digits.startsWith("7")) {
+    digits = "7" + digits;
+  }
+  let formatted = "+7";
+  if (digits.length > 1) {
+    formatted += " (" + digits.substring(1, 4);
+  }
+  if (digits.length >= 5) {
+    formatted += ") " + digits.substring(4, 7);
+  }
+  if (digits.length >= 8) {
+    formatted += "-" + digits.substring(7, 9);
+  }
+  if (digits.length >= 10) {
+    formatted += "-" + digits.substring(9, 11);
+  }
+  return formatted;
+}
+
+export default defineComponent({
+  name: "TrainerCard",
+  components: { UserFilled },
+  props: {
+    trainer: {
+      type: Object as PropType<Trainer>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      hovered: false,
+    };
+  },
+  computed: {
+    formattedPhone(): string {
+      return this.trainer.phone ? formatPhone(this.trainer.phone) : "";
+    },
+  },
+});
+</script>
+
+<style scoped>
+.trainer-card {
+  position: relative;
+  margin-bottom: 20px;
+  transition: box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.trainer-card:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.trainer-photo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.trainer-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.trainer-avatar {
+  width: 100px;
+  height: 100px;
+  font-size: 50px;
+  background-color: #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.overlay button {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>

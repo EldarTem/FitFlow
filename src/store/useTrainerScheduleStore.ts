@@ -1,49 +1,68 @@
+// src/store/useTrainerScheduleStore.ts
 import { defineStore } from 'pinia';
 import api from '@/services/api';
-import { ElNotification } from 'element-plus';
 import { WorkingHour } from '@/types';
+import { ElNotification } from 'element-plus';
+import { useUiStore } from './useUiStore';
+
+interface TrainerScheduleState {
+  workingHours: WorkingHour[];
+}
 
 export const useTrainerScheduleStore = defineStore('trainerSchedule', {
-  state: () => ({
-    workingHours: [] as WorkingHour[],
+  state: (): TrainerScheduleState => ({
+    workingHours: [],
   }),
   actions: {
     async fetchWorkingHours() {
+      const uiStore = useUiStore();
+      uiStore.showLoader();
       try {
         const response = await api.get('/trainer-schedule');
         this.workingHours = response.data;
       } catch (error) {
         ElNotification.error('Ошибка загрузки расписания');
+      } finally {
+        uiStore.hideLoader();
       }
     },
-
-    async addHour(hour: WorkingHour) {
+    async addWorkingHour(hour: Partial<WorkingHour>) {
+      const uiStore = useUiStore();
+      uiStore.showLoader();
       try {
-        const response = await api.post('/trainer-schedule', hour);
-        this.workingHours.push(response.data);
+        await api.post('/trainer-schedule', hour);
         ElNotification.success('Рабочее время добавлено');
+        await this.fetchWorkingHours();
       } catch (error) {
         ElNotification.error('Ошибка добавления рабочего времени');
+      } finally {
+        uiStore.hideLoader();
       }
     },
-
-    async updateHour(hour: WorkingHour) {
+    async updateWorkingHour(hour: WorkingHour) {
+      const uiStore = useUiStore();
+      uiStore.showLoader();
       try {
         await api.put(`/trainer-schedule/${hour.id}`, hour);
-        await this.fetchWorkingHours();
         ElNotification.success('Рабочее время обновлено');
+        await this.fetchWorkingHours();
       } catch (error) {
         ElNotification.error('Ошибка обновления рабочего времени');
+      } finally {
+        uiStore.hideLoader();
       }
     },
-
-    async deleteHour(id: number) {
+    async deleteWorkingHour(id: number) {
+      const uiStore = useUiStore();
+      uiStore.showLoader();
       try {
         await api.delete(`/trainer-schedule/${id}`);
-        this.workingHours = this.workingHours.filter((hour) => hour.id !== id);
         ElNotification.success('Рабочее время удалено');
+        this.workingHours = this.workingHours.filter((h) => h.id !== id);
       } catch (error) {
         ElNotification.error('Ошибка удаления рабочего времени');
+      } finally {
+        uiStore.hideLoader();
       }
     },
   },

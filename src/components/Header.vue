@@ -7,58 +7,45 @@
         <span>FitFlow</span>
       </div>
     </router-link>
-    <el-menu
-      :default-active="$route.path"
-      mode="horizontal"
-      router
-      class="menu"
-    >
-      <!-- Показываем пункты только если пользователь авторизован -->
-      <template v-if="user">
-        <!-- Пункты для user и/или trainer -->
-        <el-menu-item v-if="isUserOrTrainer" index="/dashboard/workouts"
-          >Тренировки</el-menu-item
-        >
-        <el-menu-item v-if="isUserOrTrainer" index="/dashboard/progress"
-          >Прогресс</el-menu-item
-        >
+    <div class="menu-container">
+      <el-menu :default-active="$route.path" mode="horizontal" router>
+        <template v-if="user">
+          <template v-if="isUser">
+            <el-menu-item index="/dashboard/workouts">Тренировки</el-menu-item>
+          </template>
 
-        <!-- Только user -->
-        <el-menu-item v-if="isUser" index="/dashboard/subscription"
-          >Абонемент</el-menu-item
-        >
+          <template v-if="isTrainer">
+            <el-menu-item index="/dashboard/trainer-schedule"
+              >Моё расписание</el-menu-item
+            >
+          </template>
+          <template v-if="isGymAdmin">
+            <el-menu-item index="/dashboard/clients">Клиенты</el-menu-item>
+            <el-menu-item index="/dashboard/gym-trainers"
+              >Тренеры зала</el-menu-item
+            >
+          </template>
 
-        <!-- Для super_admin, gym_admin, trainer -->
-        <el-menu-item
-          v-if="isSuperAdmin || isGymAdmin || isTrainer"
-          index="/dashboard/trainers"
-          >Тренеры</el-menu-item
-        >
+          <template v-if="isSuperAdmin">
+            <el-menu-item index="/dashboard/gyms">Спортзалы</el-menu-item>
+            <el-menu-item index="/dashboard/full-trainers"
+              >Тренеры</el-menu-item
+            >
+          </template>
 
-        <!-- Профиль доступен всем авторизованным -->
-        <el-menu-item index="/dashboard/profile">Профиль</el-menu-item>
-
-        <!-- Только trainer -->
-
-        <el-menu-item v-if="isTrainer" index="/dashboard/trainer-schedule"
-          >Мое расписание</el-menu-item
-        >
-
-        <!-- gym_admin -->
-        <el-menu-item v-if="isGymAdmin" index="/dashboard/manage-gym"
-          >Управление залом</el-menu-item
-        >
-
-        <!-- super_admin -->
-        <el-menu-item v-if="isSuperAdmin" index="/dashboard/gyms"
-          >Залы</el-menu-item
-        >
-        <el-menu-item v-if="isSuperAdmin" index="/dashboard/users"
-          >Пользователи</el-menu-item
-        >
-      </template>
-      <!-- Если нет пользователя (не авторизован), можно здесь добавить пункты 'Login', 'Register', если нужно -->
-    </el-menu>
+          <el-menu-item index="/dashboard/profile">Профиль</el-menu-item>
+          <el-menu-item>
+            <el-button type="danger" size="small" @click="logout"
+              >Выйти</el-button
+            >
+          </el-menu-item>
+        </template>
+        <template v-else>
+          <el-menu-item index="/login">Войти</el-menu-item>
+          <el-menu-item index="/register">Регистрация</el-menu-item>
+        </template>
+      </el-menu>
+    </div>
   </el-header>
 </template>
 
@@ -74,15 +61,16 @@ export default defineComponent({
   },
   setup() {
     const authStore = useAuthStore();
-    const user = authStore.user;
+    const user = computed(() => authStore.user);
 
-    const isUser = computed(() => user?.role === "user");
-    const isTrainer = computed(() => user?.role === "trainer");
-    const isGymAdmin = computed(() => user?.role === "gym_admin");
-    const isSuperAdmin = computed(() => user?.role === "super_admin");
-    const isUserOrTrainer = computed(
-      () => user && (user.role === "user" || user.role === "trainer")
-    );
+    const isUser = computed(() => user.value?.role === "user");
+    const isTrainer = computed(() => user.value?.role === "trainer");
+    const isGymAdmin = computed(() => user.value?.role === "gym_admin");
+    const isSuperAdmin = computed(() => user.value?.role === "super_admin");
+
+    const logout = () => {
+      authStore.logout();
+    };
 
     return {
       user,
@@ -90,7 +78,7 @@ export default defineComponent({
       isTrainer,
       isGymAdmin,
       isSuperAdmin,
-      isUserOrTrainer,
+      logout,
     };
   },
 });
@@ -106,9 +94,10 @@ export default defineComponent({
 }
 
 .logo-link {
-  text-decoration: none; /* Убираем подчеркивание ссылки */
-  color: inherit; /* Наследуем цвет текста */
-  display: flex; /* Чтобы весь блок был кликабельным */
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
 }
 
 .logo {
@@ -116,18 +105,20 @@ export default defineComponent({
   align-items: center;
   font-size: 24px;
   font-weight: bold;
-  margin-right: 50px;
 }
 
 .logo el-icon {
   margin-right: 10px;
 }
 
-.menu {
-  flex-grow: 1;
+.menu-container {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
-.menu .el-menu-item {
+.menu-container .el-menu-item {
   font-size: 16px;
+  margin: 0 5px;
 }
 </style>

@@ -1,15 +1,14 @@
-// src/router/index.ts
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { useAuthStore } from '@/store/useAuthStore';
 
-// Импортируем лейаут
 import MainLayout from '@/layouts/MainLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
+
 const routes: Array<RouteRecordRaw> = [
   { path: '/', redirect: '/login' },
   {
     path: '/',
-    component: AuthLayout, // Используем AuthLayout как обёртку для публичных страниц
+    component: AuthLayout,
     children: [
       {
         path: '/login',
@@ -23,10 +22,9 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-
   {
     path: '/dashboard',
-    component: MainLayout, // Используем MainLayout как обёртку
+    component: MainLayout,
     meta: { requiresAuth: true },
     children: [
       {
@@ -45,38 +43,53 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/WorkoutsView.vue'),
         meta: { allowedRoles: ['user', 'trainer'] },
       },
-      {
-        path: 'progress',
-        name: 'Progress',
-        component: () => import('@/views/ProgressView.vue'),
-        meta: { allowedRoles: ['user', 'trainer'] },
-      },
+
       {
         path: 'subscription',
         name: 'Subscription',
         component: () => import('@/views/SubscriptionView.vue'),
         meta: { allowedRoles: ['user'] },
       },
-
       {
         path: 'trainer-schedule',
         name: 'TrainerSchedule',
         component: () => import('@/views/TrainerScheduleView.vue'),
         meta: { allowedRoles: ['trainer'] },
       },
-
       {
         path: 'gyms',
         name: 'Gyms',
         component: () => import('@/views/GymsView.vue'),
         meta: { allowedRoles: ['super_admin'] },
       },
-
       {
         path: 'trainers',
         name: 'Trainers',
         component: () => import('@/views/TrainersView.vue'),
         meta: { allowedRoles: ['super_admin', 'gym_admin', 'trainer'] },
+      },
+      {
+        path: 'not-authorized',
+        name: 'NotAuthorized',
+        component: () => import('@/views/NotAuthorizedView.vue'),
+      },
+      {
+        path: 'full-trainers',
+        name: 'FullTrainers',
+        component: () => import('@/views/AllTrainersView.vue'),
+        meta: { allowedRoles: ['super_admin'] },
+      },
+      {
+        path: 'gym-trainers',
+        name: 'GymTrainers',
+        component: () => import('@/views/GymTrainersView.vue'),
+        meta: { allowedRoles: ['gym_admin'] },
+      },
+      {
+        path: 'clients',
+        name: 'GymClients',
+        component: () => import('@/views/ClientsView.vue'),
+        meta: { allowedRoles: ['gym_admin'] },
       },
     ],
   },
@@ -99,10 +112,6 @@ router.beforeEach(async (to, _from, next) => {
       try {
         await authStore.getUserProfile();
       } catch (error) {
-        console.error(error);
-        return next('/login');
-      }
-      if (!authStore.user) {
         return next('/login');
       }
     }
@@ -110,7 +119,7 @@ router.beforeEach(async (to, _from, next) => {
     if (to.meta.allowedRoles && authStore.user) {
       const allowedRoles = to.meta.allowedRoles as string[];
       if (!allowedRoles.includes(authStore.user.role)) {
-        return next('/dashboard');
+        return next('/dashboard/not-authorized');
       }
     }
   }
