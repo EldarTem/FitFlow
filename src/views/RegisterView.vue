@@ -124,9 +124,7 @@ export default defineComponent({
     };
 
     const formatPhone = (value: string): string => {
-      // Удаляем все нечисловые символы
       let digits = value.replace(/\D/g, "");
-      // Приведём к формату +7 (XXX) XXX-XX-XX
       if (!digits.startsWith("7")) {
         digits = "7" + digits;
       }

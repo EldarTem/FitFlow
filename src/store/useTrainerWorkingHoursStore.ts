@@ -27,7 +27,16 @@ export const useTrainerWorkingHoursStore = defineStore('trainerWorkingHours', {
       uiStore.showLoader();
       try {
         const response = await api.get(`/trainer-working-hours/${trainer_id}`);
-        this.workingHours = response.data;
+        this.workingHours = response.data.map((wh: any) => ({
+          id: wh.working_hour_id,
+          trainer_id: wh.trainer_id,
+          day_of_week: wh.day_of_week,
+          specific_date: wh.specific_date,
+          start_time: wh.start_time,
+          end_time: wh.end_time,
+          status: wh.working_hour_status,
+          sessions: wh.sessions,
+        }));
       } catch (error) {
         ElNotification.error('Ошибка при получении рабочих часов тренера');
       } finally {
@@ -38,7 +47,7 @@ export const useTrainerWorkingHoursStore = defineStore('trainerWorkingHours', {
       const uiStore = useUiStore();
       uiStore.showLoader();
       try {
-        await api.put(`/trainer-working-hours/${hour.id}`, hour);
+        await api.put(`/trainer-working-hours/${hour.working_hour_id}`, hour);
         ElNotification.success('Рабочий час успешно обновлён');
       } catch (error) {
         ElNotification.error('Ошибка при обновлении рабочего часа');
@@ -52,7 +61,9 @@ export const useTrainerWorkingHoursStore = defineStore('trainerWorkingHours', {
       try {
         await api.delete(`/trainer-working-hours/${id}`);
         ElNotification.success('Рабочий час успешно удалён');
-        this.workingHours = this.workingHours.filter((h) => h.id !== id);
+        this.workingHours = this.workingHours.filter(
+          (h) => h.working_hour_id !== id
+        );
       } catch (error) {
         ElNotification.error('Ошибка при удалении рабочего часа');
       } finally {

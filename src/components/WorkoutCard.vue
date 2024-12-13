@@ -33,7 +33,6 @@ export default defineComponent({
     const enroll = async () => {
       if (!authStore.user) return;
       try {
-        // Предполагается эндпоинт /enrollments или подобный – подкорректируйте по вашему бэку
         await api.post("/enrollments", {
           userId: authStore.user.id,
           workoutId: props.workout.id,

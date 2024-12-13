@@ -37,6 +37,7 @@ export interface WorkingHour {
   start_time: string;
   end_time: string;
   status: 'available' | 'booked';
+  sessions?: any; // если нужны сессии
 }
 
 export interface TrainingSession {

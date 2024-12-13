@@ -1,6 +1,5 @@
 <!-- src/components/Header.vue -->
 <template>
-  <el-header height="60px" class="header">
     <router-link to="/dashboard" class="logo-link">
       <div class="logo">
         <el-icon><UserFilled /></el-icon>
@@ -46,7 +45,6 @@
         </template>
       </el-menu>
     </div>
-  </el-header>
 </template>
 
 <script lang="ts">
@@ -85,13 +83,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.header {
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  background-color: #fff;
-  border-bottom: 1px solid #ebeef5;
-}
+
 
 .logo-link {
   text-decoration: none;

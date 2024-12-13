@@ -32,8 +32,6 @@ export default defineComponent({
     const gym = ref<Gym | null>(null);
 
     onMounted(async () => {
-      // Допустим, получаем зал пользователя из /memberships/current или /users/profile/gym
-      // Адаптируйте под ваш реальный эндпоинт
       const response = await api.get("/users/my-gym");
       gym.value = response.data;
     });

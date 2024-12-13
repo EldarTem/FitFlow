@@ -113,7 +113,6 @@ export const useAuthStore = defineStore('auth', {
       router.push('/login');
     },
 
-    // Новый метод для повышения роли пользователя
     async assignRoleToUser(user_id: number, role: string) {
       const uiStore = useUiStore();
       uiStore.showLoader();
