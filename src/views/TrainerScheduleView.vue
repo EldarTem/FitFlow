@@ -3,15 +3,20 @@
     <h2>Моё расписание</h2>
 
     <el-empty v-if="!workingHours.length" description="Расписание отсутствует">
-      <el-button type="primary" icon="el-icon-plus" @click="openForm"
-        >Добавить рабочее время</el-button
-      >
     </el-empty>
 
     <el-table v-else :data="workingHours" style="width: 100%">
       <el-table-column prop="day_of_week" label="День недели" />
-      <el-table-column prop="start_time" label="Начало" />
-      <el-table-column prop="end_time" label="Конец" />
+      <el-table-column
+        :prop="'start_time'"
+        label="Начало"
+        :formatter="formatDisplayTime"
+      />
+      <el-table-column
+        :prop="'end_time'"
+        label="Конец"
+        :formatter="formatDisplayTime"
+      />
       <el-table-column label="Действия">
         <template #default="scope">
           <el-button
@@ -31,9 +36,9 @@
       </el-table-column>
     </el-table>
 
-    <el-button type="primary" icon="el-icon-plus" @click="openForm"
-      >Добавить рабочее время</el-button
-    >
+    <el-button type="primary" icon="el-icon-plus" @click="openForm">
+      Добавить рабочее время
+    </el-button>
 
     <el-dialog title="Рабочее время" v-model="showForm" @close="handleClose">
       <el-form :model="currentHour" ref="formRef" label-width="120px">
@@ -55,6 +60,7 @@
           <el-time-picker
             v-model="currentHour.start_time"
             format="HH:mm"
+            value-format="HH:mm:ss"
             placeholder="Начало"
           />
         </el-form-item>
@@ -63,6 +69,7 @@
           <el-time-picker
             v-model="currentHour.end_time"
             format="HH:mm"
+            value-format="HH:mm:ss"
             placeholder="Конец"
           />
         </el-form-item>
@@ -81,12 +88,14 @@
 <script lang="ts">
 import { defineComponent, ref, reactive, onMounted } from "vue";
 import { useTrainerScheduleStore } from "@/store/useTrainerScheduleStore";
-import { WorkingHour } from "@/types";
+import { useAuthStore } from "@/store/useAuthStore";
+import type { WorkingHour } from "@/types";
 
 export default defineComponent({
   name: "TrainerScheduleView",
   setup() {
     const scheduleStore = useTrainerScheduleStore();
+    const authStore = useAuthStore();
     const {
       workingHours,
       fetchWorkingHours,
@@ -112,13 +121,17 @@ export default defineComponent({
 
     function getEmptyWorkingHour(): Partial<WorkingHour> {
       return {
-        trainer_id: 0,
+        trainer_id: authStore.user?.id || 0,
         day_of_week: "",
         start_time: "",
         end_time: "",
       };
     }
-
+    const formatDisplayTime = (row: any, column: any, value: string) => {
+      row;
+      column;
+      return value ? value.replace(/:\d{2}$/, "") : "";
+    };
     const openForm = () => {
       Object.assign(currentHour, getEmptyWorkingHour());
       showForm.value = true;
@@ -132,12 +145,16 @@ export default defineComponent({
     const saveHour = async () => {
       try {
         loading.value = true;
+        currentHour.start_time = formatTime(currentHour.start_time);
+        currentHour.end_time = formatTime(currentHour.end_time);
         if (currentHour.id) {
           await updateWorkingHour(currentHour as WorkingHour);
         } else {
+          currentHour.trainer_id = authStore.user?.id || 0;
           await addWorkingHour(currentHour);
         }
         showForm.value = false;
+        await fetchWorkingHours();
       } catch (error) {
         console.error("Ошибка при сохранении рабочего времени", error);
       } finally {
@@ -150,6 +167,16 @@ export default defineComponent({
       showForm.value = false;
       Object.assign(currentHour, getEmptyWorkingHour());
     };
+
+    function formatTime(time: string | Date | undefined): string {
+      if (!time) return "";
+      if (typeof time === "string" && time.includes(":")) return time;
+      const date = new Date(time);
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      const seconds = date.getSeconds().toString().padStart(2, "0");
+      return `${hours}:${minutes}:${seconds}`;
+    }
 
     onMounted(() => fetchWorkingHours());
 
@@ -165,6 +192,8 @@ export default defineComponent({
       loading,
       formRef,
       handleClose,
+
+      formatDisplayTime,
     };
   },
 });

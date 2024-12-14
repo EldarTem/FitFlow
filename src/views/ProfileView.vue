@@ -1,13 +1,18 @@
 <template>
   <div class="profile-container" v-if="user">
     <UserProfileInfo @edit-profile="openProfileEditModal" @logout="logout" />
-    <UserGymInfo />
+    <!-- Компонент TrainerProfileInfo отображается только для тренера -->
+    <TrainerProfileInfo v-if="isTrainer" />
+    <!-- Компонент UserGymInfo отображается для всех, кроме супер-администратора -->
+    <UserGymInfo v-if="!isSuperAdmin" />
+
+    <!-- Диалог для редактирования профиля пользователя -->
     <el-dialog v-model="profileEditDialogVisible" title="Редактировать профиль">
-      <el-form :model="profileEditForm">
-        <el-form-item label="Имя">
+      <el-form :model="profileEditForm" label-width="120px">
+        <el-form-item label="Имя" required>
           <el-input v-model="profileEditForm.name" />
         </el-form-item>
-        <el-form-item label="Email">
+        <el-form-item label="Email" required>
           <el-input v-model="profileEditForm.email" />
         </el-form-item>
         <el-form-item label="Телефон">
@@ -34,6 +39,7 @@ import { defineComponent, ref, computed, onMounted } from "vue";
 import { useAuthStore } from "@/store/useAuthStore";
 import UserProfileInfo from "@/components/UserProfileInfo.vue";
 import UserGymInfo from "@/components/UserGymInfo.vue";
+import TrainerProfileInfo from "@/components/TrainerProfileInfo.vue";
 import { User } from "@/types";
 import { ElNotification } from "element-plus";
 
@@ -67,11 +73,15 @@ function isValidEmail(email: string): boolean {
 
 export default defineComponent({
   name: "ProfileView",
-  components: { UserProfileInfo, UserGymInfo },
+  components: { UserProfileInfo, UserGymInfo, TrainerProfileInfo },
   setup() {
     const authStore = useAuthStore();
 
     const user = computed(() => authStore.user);
+
+    // Вычисляемые свойства для проверки роли пользователя
+    const isSuperAdmin = computed(() => user.value?.role === "super_admin");
+    const isTrainer = computed(() => user.value?.role === "trainer");
 
     const profileEditDialogVisible = ref(false);
     const profileEditForm = ref<ProfileEditForm>({
@@ -100,8 +110,13 @@ export default defineComponent({
       }
       try {
         await authStore.updateUserProfile(profileEditForm.value);
+        ElNotification.success("Профиль успешно обновлен");
         profileEditDialogVisible.value = false;
-      } catch (error) {}
+      } catch (error: any) {
+        ElNotification.error(
+          error?.response?.data?.message || "Не удалось обновить профиль"
+        );
+      }
     };
 
     onMounted(() => {
@@ -110,6 +125,8 @@ export default defineComponent({
 
     return {
       user,
+      isSuperAdmin,
+      isTrainer,
       profileEditDialogVisible,
       profileEditForm,
       openProfileEditModal,

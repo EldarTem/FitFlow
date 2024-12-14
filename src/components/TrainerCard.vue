@@ -21,7 +21,6 @@
     </div>
     <h3>{{ trainer.name }}</h3>
     <p><strong>Email:</strong> {{ trainer.email }}</p>
-    <p><strong>Телефон:</strong> {{ formattedPhone }}</p>
     <p><strong>Специализация:</strong> {{ trainer.specialization }}</p>
     <p><strong>Опыт (лет):</strong> {{ trainer.experience_years }}</p>
     <p><strong>Биография:</strong> {{ trainer.bio }}</p>
@@ -47,27 +46,6 @@ import { defineComponent, PropType } from "vue";
 import { Trainer } from "@/types";
 import { UserFilled } from "@element-plus/icons-vue";
 
-function formatPhone(value: string): string {
-  let digits = value.replace(/\D/g, "");
-  if (!digits.startsWith("7")) {
-    digits = "7" + digits;
-  }
-  let formatted = "+7";
-  if (digits.length > 1) {
-    formatted += " (" + digits.substring(1, 4);
-  }
-  if (digits.length >= 5) {
-    formatted += ") " + digits.substring(4, 7);
-  }
-  if (digits.length >= 8) {
-    formatted += "-" + digits.substring(7, 9);
-  }
-  if (digits.length >= 10) {
-    formatted += "-" + digits.substring(9, 11);
-  }
-  return formatted;
-}
-
 export default defineComponent({
   name: "TrainerCard",
   components: { UserFilled },
@@ -81,11 +59,6 @@ export default defineComponent({
     return {
       hovered: false,
     };
-  },
-  computed: {
-    formattedPhone(): string {
-      return this.trainer.phone ? formatPhone(this.trainer.phone) : "";
-    },
   },
 });
 </script>

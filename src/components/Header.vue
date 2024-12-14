@@ -1,13 +1,22 @@
 <!-- src/components/Header.vue -->
 <template>
-    <router-link to="/dashboard" class="logo-link">
-      <div class="logo">
-        <el-icon><UserFilled /></el-icon>
-        <span>FitFlow</span>
+  <div class="menu-container">
+    <el-menu
+      :default-active="$route.path"
+      mode="horizontal"
+      router
+      collapse-transition="false"
+      class="menu-container"
+    >
+      <div class="cont-logo">
+        <el-menu-item index="/dashboard" class="logo-link">
+          <div class="logo">
+            <el-icon><UserFilled /></el-icon>
+            <span>FitFlow</span>
+          </div>
+        </el-menu-item>
       </div>
-    </router-link>
-    <div class="menu-container">
-      <el-menu :default-active="$route.path" mode="horizontal" router>
+      <div class="cont-b">
         <template v-if="user">
           <template v-if="isUser">
             <el-menu-item index="/dashboard/workouts">Тренировки</el-menu-item>
@@ -17,19 +26,24 @@
             <el-menu-item index="/dashboard/trainer-schedule"
               >Моё расписание</el-menu-item
             >
+            <el-menu-item index="/dashboard/books">Мои тренировки</el-menu-item>
           </template>
           <template v-if="isGymAdmin">
-            <el-menu-item index="/dashboard/clients">Клиенты</el-menu-item>
-            <el-menu-item index="/dashboard/gym-trainers"
+            <el-menu-item index="/dashboard/clients" tabindex="-1"
+              >Клиенты</el-menu-item
+            >
+            <el-menu-item index="/dashboard/gym-trainers" tabindex="-1"
               >Тренеры зала</el-menu-item
             >
           </template>
 
           <template v-if="isSuperAdmin">
-            <el-menu-item index="/dashboard/gyms">Спортзалы</el-menu-item>
+            <el-menu-item index="/dashboard/clients">Клиенты</el-menu-item>
             <el-menu-item index="/dashboard/full-trainers"
               >Тренеры</el-menu-item
             >
+
+            <el-menu-item index="/dashboard/gyms">Спортзалы</el-menu-item>
           </template>
 
           <el-menu-item index="/dashboard/profile">Профиль</el-menu-item>
@@ -43,8 +57,9 @@
           <el-menu-item index="/login">Войти</el-menu-item>
           <el-menu-item index="/register">Регистрация</el-menu-item>
         </template>
-      </el-menu>
-    </div>
+      </div>
+    </el-menu>
+  </div>
 </template>
 
 <script lang="ts">
@@ -83,8 +98,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
-
 .logo-link {
   text-decoration: none;
   color: inherit;
@@ -102,15 +115,29 @@ export default defineComponent({
 .logo el-icon {
   margin-right: 10px;
 }
-
 .menu-container {
   display: flex;
   align-items: center;
-  margin-left: auto;
+  justify-content: space-between; /* Равномерное распределение */
+  width: 100%; /* Меню занимает всю ширину строки */
+  overflow: visible; /* Убираем обрезание пунктов */
 }
 
-.menu-container .el-menu-item {
-  font-size: 16px;
-  margin: 0 5px;
+.el-menu {
+  display: flex !important; /* Принудительное использование flexbox */
+  flex-wrap: nowrap !important; /* Отключаем перенос строк */
+  justify-content: space-between; /* Выравниваем пункты слева */
+  width: 100%; /* Меню занимает всю ширину */
+  overflow: visible !important; /* Убираем скрытие элементов */
+}
+
+.el-menu-item {
+  white-space: nowrap !important; /* Отключаем перенос текста */
+  margin: 0 15px; /* Отступы между пунктами меню */
+  flex-shrink: 0; /* Запрещаем сжимание пунктов */
+}
+
+.cont-b {
+  display: flex;
 }
 </style>

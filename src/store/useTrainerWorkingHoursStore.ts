@@ -1,9 +1,9 @@
 // src/store/useTrainerWorkingHoursStore.ts
 import { defineStore } from 'pinia';
 import api from '@/services/api';
-import { WorkingHour } from '@/types';
 import { ElNotification } from 'element-plus';
 import { useUiStore } from './useUiStore';
+import type { WorkingHour } from '@/types';
 
 export const useTrainerWorkingHoursStore = defineStore('trainerWorkingHours', {
   state: () => ({
@@ -35,9 +35,13 @@ export const useTrainerWorkingHoursStore = defineStore('trainerWorkingHours', {
           start_time: wh.start_time,
           end_time: wh.end_time,
           status: wh.working_hour_status,
-          sessions: wh.sessions,
+          sessions:
+            typeof wh.sessions === 'string'
+              ? JSON.parse(wh.sessions)
+              : wh.sessions || [],
         }));
       } catch (error) {
+        console.error('Ошибка при получении рабочих часов тренера', error);
         ElNotification.error('Ошибка при получении рабочих часов тренера');
       } finally {
         uiStore.hideLoader();
@@ -47,7 +51,7 @@ export const useTrainerWorkingHoursStore = defineStore('trainerWorkingHours', {
       const uiStore = useUiStore();
       uiStore.showLoader();
       try {
-        await api.put(`/trainer-working-hours/${hour.working_hour_id}`, hour);
+        await api.put(`/trainer-working-hours/${hour.id}`, hour);
         ElNotification.success('Рабочий час успешно обновлён');
       } catch (error) {
         ElNotification.error('Ошибка при обновлении рабочего часа');
@@ -61,9 +65,7 @@ export const useTrainerWorkingHoursStore = defineStore('trainerWorkingHours', {
       try {
         await api.delete(`/trainer-working-hours/${id}`);
         ElNotification.success('Рабочий час успешно удалён');
-        this.workingHours = this.workingHours.filter(
-          (h) => h.working_hour_id !== id
-        );
+        this.workingHours = this.workingHours.filter((h) => h.id !== id);
       } catch (error) {
         ElNotification.error('Ошибка при удалении рабочего часа');
       } finally {

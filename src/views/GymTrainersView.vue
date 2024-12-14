@@ -52,11 +52,7 @@
           required
           v-if="!currentTrainer.user_id"
         >
-          <el-input
-            v-model="promoteUserId"
-            type="number"
-            placeholder="ID пользователя"
-          />
+          <el-input v-model="promoteUserId" placeholder="ID пользователя" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -145,7 +141,7 @@ export default defineComponent({
       role: "trainer",
     });
 
-    const promoteUserId = ref<number | null>(null);
+    const promoteUserId = ref<string | null>(null);
     const schedule = ref<WorkingHour[]>([]);
     const showScheduleDialog = ref(false);
 
@@ -197,8 +193,8 @@ export default defineComponent({
       showForm.value = false;
     };
 
-    const deleteTrainer = async (user_id: number) => {
-      await trainerDetailsStore.deleteTrainerDetailsById(user_id);
+    const deleteTrainer = async () => {
+      await trainerDetailsStore.deleteTrainerDetails();
     };
 
     const viewSchedule = async (user_id: number) => {

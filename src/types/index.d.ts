@@ -6,6 +6,8 @@ export interface User {
   email: string;
   phone: string;
   role: 'super_admin' | 'gym_admin' | 'trainer' | 'user';
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Gym {
@@ -17,10 +19,10 @@ export interface Gym {
 }
 
 export interface Trainer {
-  user_id: number;
-  name: string;
-  email: string;
-  phone: string;
+  user_id?: number;
+  name?: string; // Сделаем необязательными, так как при редактировании они не нужны
+  email?: string;
+  phone?: string;
   specialization: string;
   experience_years?: number;
   bio?: string;
@@ -30,6 +32,7 @@ export interface Trainer {
 }
 
 export interface WorkingHour {
+  working_hour_id: number;
   id: number;
   trainer_id: number;
   day_of_week: string;
@@ -37,7 +40,7 @@ export interface WorkingHour {
   start_time: string;
   end_time: string;
   status: 'available' | 'booked';
-  sessions?: any; // если нужны сессии
+  sessions?: any; // Можно уточнить тип, если известен
 }
 
 export interface TrainingSession {
@@ -55,6 +58,14 @@ export interface AuthState {
   user: User | null;
   token: string | null;
   errorMessage: string;
+  clients: User[]; // Добавлено для хранения клиентов
+  meta: Meta;
+}
+
+export interface Meta {
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export interface UiState {

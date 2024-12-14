@@ -1,7 +1,7 @@
 // src/store/useAuthStore.ts
 import { defineStore } from 'pinia';
 import api from '@/services/api';
-import { AuthState, User } from '@/types';
+import { AuthState, User, Meta } from '@/types';
 import router from '@/router';
 import { ElNotification } from 'element-plus';
 import { useUiStore } from './useUiStore';
@@ -11,6 +11,12 @@ export const useAuthStore = defineStore('auth', {
     user: null,
     token: localStorage.getItem('token'),
     errorMessage: '',
+    clients: [],
+    meta: {
+      total: 0,
+      page: 1,
+      limit: 10,
+    },
   }),
   actions: {
     async login(email: string, password: string) {
@@ -113,16 +119,41 @@ export const useAuthStore = defineStore('auth', {
       router.push('/login');
     },
 
-    async assignRoleToUser(user_id: number, role: string) {
+    async assignRoleToUser(email: string, role: string) {
       const uiStore = useUiStore();
       uiStore.showLoader();
       try {
-        await api.post('/users/promote', { user_id, role });
+        await api.post('/users/promote', { email, role });
         ElNotification.success('Роль успешно назначена');
       } catch (error: any) {
         ElNotification.error(
           error?.response?.data?.message ||
             'Не удалось назначить роль пользователю'
+        );
+      } finally {
+        uiStore.hideLoader();
+      }
+    },
+
+    async fetchAllUsers(
+      page: number = 1,
+      limit: number = 10,
+      role: string = 'user'
+    ) {
+      const uiStore = useUiStore();
+      uiStore.showLoader();
+      try {
+        const params: any = {
+          page,
+          limit,
+          role, // Указываем роль в параметрах запроса
+        };
+        const response = await api.get('/users/all', { params });
+        this.clients = response.data.users;
+        this.meta = response.data.meta as Meta;
+      } catch (error: any) {
+        ElNotification.error(
+          error?.response?.data?.message || 'Не удалось загрузить клиентов'
         );
       } finally {
         uiStore.hideLoader();

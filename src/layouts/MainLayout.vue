@@ -1,7 +1,11 @@
 <!-- src/layouts/MainLayout.vue -->
 <template>
   <el-container>
-    <el-header height="60px" class="header">
+    <el-header
+      height="60px"
+      style="border-bottom: 1px solid var(--el-menu-border-color);
+}"
+    >
       <Header />
     </el-header>
     <el-main>
@@ -28,13 +32,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.header {
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  background-color: #fff;
-  border-bottom: 1px solid #ebeef5;
-}
 .footer {
   text-align: center;
   color: #909399;

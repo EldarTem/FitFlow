@@ -1,7 +1,6 @@
 <!-- src/components/Footer.vue -->
 <template>
-    <p>© 2023 FitFlow. Все права защищены.</p>
-  
+  <p>© 2024 FitFlow. Все права защищены.</p>
 </template>
 
 <script lang="ts">
@@ -11,5 +10,3 @@ export default defineComponent({
   name: "Footer",
 });
 </script>
-
-

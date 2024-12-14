@@ -59,17 +59,35 @@ export const useTrainerDetailsStore = defineStore('trainerDetails', {
         uiStore.hideLoader();
       }
     },
-    async deleteTrainerDetailsById(user_id: number) {
+    async deleteTrainerDetails() {
       const uiStore = useUiStore();
       uiStore.showLoader();
       try {
-        await api.delete(`/trainer-details/byid/${user_id}`);
-        ElNotification.success('Тренер удален');
+        const response = await api.delete('/trainer-details');
+        ElNotification.success(
+          response.data.message || 'Тренер удалён успешно'
+        );
         await this.fetchAllTrainers();
       } catch (error: any) {
         ElNotification.error(
           error?.response?.data?.message || 'Не удалось удалить тренера'
         );
+      } finally {
+        uiStore.hideLoader();
+      }
+    },
+    async fetchTrainerById(user_id: number): Promise<Trainer | null> {
+      const uiStore = useUiStore();
+      uiStore.showLoader();
+      try {
+        const response = await api.get(`/trainer-details/${user_id}`);
+        return response.data as Trainer;
+      } catch (error: any) {
+        ElNotification.error(
+          error?.response?.data?.message ||
+            'Не удалось загрузить информацию о тренере'
+        );
+        return null;
       } finally {
         uiStore.hideLoader();
       }

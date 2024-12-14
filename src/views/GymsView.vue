@@ -1,6 +1,6 @@
 <template>
   <div class="gyms-page">
-    <h2>Управление залами (Только для super_admin)</h2>
+    <h2>Управление залами</h2>
     <el-table :data="gyms" style="width: 100%">
       <el-table-column prop="name" label="Название" />
       <el-table-column prop="address" label="Адрес" />
