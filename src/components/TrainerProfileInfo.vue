@@ -53,7 +53,6 @@
       <span>Вы уверены, что хотите удалить свою информацию о тренере?</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="confirmDialogVisible = false">Отмена</el-button>
-        <el-button type="danger" @click="deleteTrainer">Удалить</el-button>
       </span>
     </el-dialog>
   </div>
@@ -160,26 +159,6 @@ export default defineComponent({
 
     const confirmDelete = () => {
       confirmDialogVisible.value = true;
-    };
-
-    const deleteTrainer = async () => {
-      if (!trainer.value) {
-        ElNotification.error("Информация о тренере не загружена");
-        return;
-      }
-      try {
-        // Используем user_id вместо id
-        await trainerStore.deleteTrainerDetails(trainer.value.user_id!);
-        ElNotification.success("Информация о тренере успешно удалена");
-        confirmDialogVisible.value = false;
-        trainer.value = null;
-        await authStore.getUserProfile(); // Обновляем данные пользователя
-      } catch (error: any) {
-        ElNotification.error(
-          error?.response?.data?.message ||
-            "Не удалось удалить информацию о тренере"
-        );
-      }
     };
 
     onMounted(() => {

@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, reactive } from "vue";
+import { defineComponent, onMounted, ref, reactive, computed } from "vue";
 import { useGymStore } from "@/store/useGymStore";
 import { Gym } from "@/types";
 import { useUiStore } from "@/store/useUiStore";
@@ -94,7 +94,7 @@ export default defineComponent({
       phone: "",
       email: "",
     });
-
+    const gyms = computed(() => gymStore.gyms);
     const openAddForm = () => {
       currentGym.id = undefined;
       currentGym.name = "";
@@ -112,7 +112,9 @@ export default defineComponent({
       currentGym.email = gym.email || "";
       showForm.value = true;
     };
-
+    const fetchAllGyms = async () => {
+      await gymStore.fetchGyms();
+    };
     const removeGym = async (id?: number) => {
       if (id) {
         await gymStore.deleteGym(id);
@@ -136,11 +138,11 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      gymStore.fetchGyms();
+      fetchAllGyms();
     });
 
     return {
-      gyms: gymStore.gyms,
+      gyms,
       showForm,
       currentGym,
       openAddForm,

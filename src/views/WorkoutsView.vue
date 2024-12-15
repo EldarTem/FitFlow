@@ -4,8 +4,9 @@
     <el-tabs v-model="activeTab">
       <el-tab-pane label="Предстоящие" name="upcoming">
         <el-table :data="upcomingSessions" style="width: 100%">
-          <el-table-column prop="specific_date" label="Дата" width="150" />
-          <el-table-column prop="training_type" label="Тип тренировки" />
+          <el-table-column prop="day_of_week" label="День недели" />
+          <el-table-column prop="start_time" label="Начало" />
+          <el-table-column prop="end_time" label="Конец" />
           <el-table-column prop="trainer_name" label="Тренер" />
         </el-table>
         <el-button
@@ -19,8 +20,9 @@
       </el-tab-pane>
       <el-tab-pane label="Прошедшие" name="completed">
         <el-table :data="completedSessions" style="width: 100%">
-          <el-table-column prop="specific_date" label="Дата" width="150" />
-          <el-table-column prop="training_type" label="Тип тренировки" />
+          <el-table-column prop="day_of_week" label="День недели" />
+          <el-table-column prop="start_time" label="Начало" />
+          <el-table-column prop="end_time" label="Конец" />
           <el-table-column prop="trainer_name" label="Тренер" />
         </el-table>
       </el-tab-pane>
@@ -70,7 +72,7 @@
                 <el-button
                   type="success"
                   size="small"
-                  @click="enroll(scope.row.working_hour_id)"
+                  @click="enroll(scope.row.id)"
                 >
                   Записаться
                 </el-button>
@@ -145,7 +147,7 @@ export default defineComponent({
     };
 
     const fetchAvailableTimes = async () => {
-      if (enrollForm.value.trainer_id) {
+      if (typeof enrollForm.value.trainer_id === "number") {
         await trainerWorkingHoursStore.getTrainerWorkingHours(
           enrollForm.value.trainer_id
         );

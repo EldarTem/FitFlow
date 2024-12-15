@@ -19,7 +19,7 @@ export interface Gym {
 }
 
 export interface Trainer {
-  user_id?: number;
+  user_id: number;
   name?: string; // Сделаем необязательными, так как при редактировании они не нужны
   email?: string;
   phone?: string;

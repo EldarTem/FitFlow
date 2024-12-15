@@ -86,7 +86,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted } from "vue";
+import { defineComponent, ref, reactive, onMounted, computed } from "vue";
 import { useTrainerScheduleStore } from "@/store/useTrainerScheduleStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import type { WorkingHour } from "@/types";
@@ -97,18 +97,22 @@ export default defineComponent({
     const scheduleStore = useTrainerScheduleStore();
     const authStore = useAuthStore();
     const {
-      workingHours,
       fetchWorkingHours,
       addWorkingHour,
       updateWorkingHour,
       deleteWorkingHour,
     } = scheduleStore;
 
+    const workingHours = computed(() => scheduleStore.workingHours);
+
     const showForm = ref(false);
     const loading = ref(false);
     const formRef = ref();
     const currentHour = reactive<Partial<WorkingHour>>(getEmptyWorkingHour());
 
+    const fetchWorking = async () => {
+      await scheduleStore.fetchWorkingHours();
+    };
     const daysOfWeek = [
       "Monday",
       "Tuesday",
@@ -178,7 +182,9 @@ export default defineComponent({
       return `${hours}:${minutes}:${seconds}`;
     }
 
-    onMounted(() => fetchWorkingHours());
+    onMounted(() => {
+      fetchWorking();
+    });
 
     return {
       workingHours,
